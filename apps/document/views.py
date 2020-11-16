@@ -5,7 +5,7 @@ from django.shortcuts import render
 
 def protectedMedia(request, org_id, doc_id, folder, doc):
     if 1 == 1:
-        print("good good good good good good good good good good good good good good good good")
+        print("good good good good good good good good good good good good good")
         print(request)
         response = HttpResponse()
         #response["Content-Disposition"] = "attachment"
