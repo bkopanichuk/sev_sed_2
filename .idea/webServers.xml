@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="5c9d23a4-e987-4ca4-b515-3c0418de6d34" name="sevsed_bg" url="http://10.0.44.244:22">
+        <fileTransfer accessType="SFTP" host="10.0.44.244" port="22" sshConfigId="e2a8164d-e6f7-4e9c-aff2-a6e23847827a" sshConfig="sedadmin@10.0.44.244:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

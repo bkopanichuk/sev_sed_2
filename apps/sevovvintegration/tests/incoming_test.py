@@ -24,11 +24,13 @@ class TestCase(TestCase):
         print('SIGNER: ', signer)
         consumer = self.create_consumer()
         print('CONSUMER: ', consumer)
-        document = self.create_document(producer, consumer,signer)
+        document = self.create_document(producer, consumer, signer)
+        document_2 = self.create_document(producer, consumer, signer)
         print('DOCUMENT: ', document)
         sign = self.create_sign(document,signer)
         print('SIGN: ', sign.sign_info)
         self.create_outgoing_document(document=document)
+        self.create_reply_outgoing_document(document=document_2, referred_document=document)
 
     def create_producer(self):
         producer_data = {
@@ -97,9 +99,14 @@ class TestCase(TestCase):
         sign.save()
         return sign
 
-    def create_outgoing_document(self,document):
+    def create_outgoing_document(self, document):
         print('CREATE TEST DATA')
         sev_outgoing = CreateSevOutgoing(document=document)
+        sev_outgoing.run()
+
+    def create_reply_outgoing_document(self, document, referred_document):
+        print('CREATE TEST REPLY DATA')
+        sev_outgoing = CreateSevOutgoing(document=document, referred_document=referred_document)
         sev_outgoing.run()
 
     def test_download_incoming(self):
