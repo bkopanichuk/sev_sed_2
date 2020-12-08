@@ -57,6 +57,19 @@ class TaskSerializerViewSet(BaseOrganizationViewSetMixing):
         task_result_serializer = TaskSerializer(res, context={'request': request})
         return Response(task_result_serializer.data)
 
+    @swagger_auto_schema(method='post', request_body=TaskApproveSerializer(),
+                         responses={200: TaskSerializer(many=False)})
+    @action(detail=True, methods=['post'])
+    def change_order(self, request, pk=None):
+        """Змінити порядок завдання. """
+        task = Task.objects.get(pk=pk)
+        ser = TaskApproveSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        flow = RetryTask(task, user=request.user, data=ser.validated_data)
+        res = flow.run()
+        task_result_serializer = TaskSerializer(res, context={'request': request})
+        return Response(task_result_serializer.data)
+
 
 class ApproveTaskSerializerViewSet(BaseOrganizationViewSetMixing):
     queryset = Task.objects.filter(goal=APPROVE)
@@ -91,7 +104,7 @@ class TaskExecutorSerializerViewSet(BaseOrganizationViewSetMixing):
     def my_execution_tasks(self, request, ):
         self.queryset = TaskExecutor.objects.filter(executor=request.user, task__goal=EXECUTE,
                                                     task__task_type=TASK,
-                                                    task__task_status__in=[RUNNING,RETRY])
+                                                    task__task_status__in=[RUNNING, RETRY])
         return self.list(request)
 
     @swagger_auto_schema(method='get',

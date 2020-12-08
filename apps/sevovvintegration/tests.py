@@ -71,5 +71,4 @@ def test():
     result = XML_SCHEMA.validate(xml_doc_valid)
     print(result)
 
-
 test()
