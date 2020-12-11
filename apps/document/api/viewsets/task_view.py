@@ -9,11 +9,12 @@ from rest_framework.views import APIView
 
 from apps.document.api.srializers.document_serializer import DocumentSerializer
 from apps.document.api.srializers.task_serializer import TaskSerializer, FlowSerializer, TaskExecutorSerializer, \
-    TaskExecutorFinishSerializer, TaskExecutorFinishApproveSerializer, TaskApproveSerializer
+    TaskExecutorFinishSerializer, TaskExecutorFinishApproveSerializer, TaskApproveSerializer, TaskChangeOrderSerializer
 from apps.document.models.document_model import ON_CONTROL
 from apps.document.models.task_model import Task, Flow, TaskExecutor, RUNNING, SUCCESS, EXECUTE, \
     APPROVE, TASK,RETRY
-from apps.document.services.task_service import FinishExecution, ApproveTask, FinishApprove, RejectApprove, RetryTask
+from apps.document.services.task_service import FinishExecution, ApproveTask, FinishApprove, RejectApprove, RetryTask, \
+    ChangeTaskOrder
 from apps.l_core.api.base.serializers import BaseOrganizationViewSetMixing
 
 
@@ -56,6 +57,16 @@ class TaskSerializerViewSet(BaseOrganizationViewSetMixing):
         res = flow.run()
         task_result_serializer = TaskSerializer(res, context={'request': request})
         return Response(task_result_serializer.data)
+
+    @swagger_auto_schema(method='post')
+    @action(detail=True, methods=['post'])
+    def change_order(self, request, pk=None):
+        """Змінити порядок завдань. """
+        task = Task.objects.get(pk=pk)
+        ser = TaskChangeOrderSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        ChangeTaskOrder(task=task, order=ser.data.get('order_direction')).run()
+        return Response(TaskSerializer(task).data)
 
 
 class ApproveTaskSerializerViewSet(BaseOrganizationViewSetMixing):

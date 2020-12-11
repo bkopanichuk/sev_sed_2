@@ -5,7 +5,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 
-
+from apps.document.services.task_service import ORDER_CHOICES, ChangeTaskOrder
 from apps.l_core.models import CoreUser
 from apps.document.api.srializers.comment_serializer import CommentSerializer
 from apps.document.models.task_model import Task, TaskExecutor, Flow, FlowApprove, EXECUTOR_ROLE, EXECUTION_TYPE
@@ -67,7 +67,11 @@ class TaskApproveSerializer(serializers.Serializer):
     controller_comment = serializers.CharField(label='Коментар контролера', required=True)
     class Meta:
         model = TaskExecutor
-        fields = ['controller_comment']
+        fields = ['controller_comment   ']
+
+
+class TaskChangeOrderSerializer(serializers.Serializer):
+    order_direction = serializers.ChoiceField(choices=ORDER_CHOICES)
 
 
 

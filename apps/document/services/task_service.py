@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.utils.timezone import localdate
 from django.db.models import Max,Min
 from rest_framework.exceptions import ValidationError
@@ -16,6 +17,10 @@ import logging
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
+ORDER_CHOICES = (
+        'UP',
+        'DOWN',
+    )
 
 class SetTaskParams:
     def __init__(self, task):
@@ -123,8 +128,7 @@ class SetChildStatus:
 
 class ChangeTaskOrder:
     """Змінити порядок виконання завдань"""
-    ## TODO Додати функціональність зміни порядку виконання завдань
-    def __init__(self, task:Task, order:str):
+    def __init__(self, task: Task, order: str):
         self.task: Task = task
         self.order = order
 
@@ -132,16 +136,31 @@ class ChangeTaskOrder:
         self.change_order()
 
     def change_order(self):
-        """змінити порядок """
-        pass
 
+        if self.order == ORDER_CHOICES[0]:
+            self.up_order()
+        else:
+            self.down_order()
+
+    @transaction.atomic
     def down_order(self):
-        """підняти задачу на пункт вище"""
-        pass
+        task_to_change = Task.objects.filter(flow=self.task.flow).filter(order__gt=self.task.order).order_by('order').first()
+        if task_to_change:
+            tmp = self.task.order
+            self.task.order = task_to_change.order
+            task_to_change.order = tmp
+            task_to_change.save()
+            self.task.save()
 
+    @transaction.atomic
     def up_order(self):
-        """опустити задачу на пункт нижче"""
-        pass
+        task_to_change = Task.objects.filter(flow=self.task.flow).filter(order__lt=self.task.order).order_by('order').last()
+        if task_to_change:
+            tmp = self.task.order
+            self.task.order = task_to_change.order
+            task_to_change.order = tmp
+            task_to_change.save()
+            self.task.save()
 
 
 

@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'sed_test_db_bg',
+        'NAME': 'sed_test_db_5',
         'HOST': 'localhost',
         'PORT': '5432',
         'USER': 'sed_user',
