@@ -1,1 +1,0 @@
-default_app_config = 'apps.l_core.apps.CoreConfig'

@@ -21,23 +21,53 @@ CREATE EXTENSION postgis version '3.0.1';
 \q
 ```
 
+
 ## Імпорт базових налаштувань
 
 ```bash
-python manage.py loaddata apps/l_core/fixtures/initial_organization.json
+python manage.py loaddata apps/l_core/fixtures/initial_auth_data.json
+python manage.py loaddata apps/l_core/fixtures/initial_lcore.json
 python manage.py loaddata apps/document/fixtures/inital_dict.json
 ```
 ## Запутисти celery
 
 ```bash
-celery -A config worker -l INFO
+celery -A config worker --loglevel=debug
+celery -A config beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
 ```
 
 Прописати вірний абсолютний члях до папки з кореневими сертифікатами в файлі  osplm.ini.
 змінити параметр Path в блоці [\SOFTWARE\Institute of Informational Technologies\Certificate Authority-1.3\End User\FileStore]
+export LD_LIBRARY_PATH="/opt/app/sevsed2/sevsed/apps/l_core/ua_sign/EUSignCP_20200521/modules"
 
+```bash
+[program:celery_tasks]
+command=/data/sev_statement_env/bin/celery worker -A sev_statement  --loglevel=INFO
+directory=/data/sev_statement
+user=root
+numprocs=1
+stdout_logfile=/var/log/celery/sev_celery_worker.log
+stderr_logfile=/var/log/celery/sev_celery_worker_error.log
+autostart=true
+autorestart=true
+startsecs=10
+stopwaitsecs = 600
+killasgroup=true
+priority=998
+```
 
+```bash
+supervisord -n -c /etc/supervisord.conf
+```
 
+Очистити тестову базу даних 
+```bash
+find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+find . -path "*/migrations/*.pyc"  -delete
+python manage.py flush
+python manage.py makemigrations
+python manage.py migrate --fake
+```
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

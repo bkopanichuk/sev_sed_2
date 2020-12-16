@@ -1,2 +1,0 @@
-class StartDateOrEndDateIsNone(Exception):
-    pass
